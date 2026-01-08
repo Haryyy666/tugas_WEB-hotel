@@ -10,14 +10,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $no_hp = trim($_POST['no_hp']); 
     $alamat = trim($_POST['alamat']); 
     $nik = trim($_POST['nik']);
-    
+    $email = trim($_POST['email']); // Field Baru
+
     // Validasi sederhana
     if (empty($nama) || empty($nik)) {
         $error = "Nama dan NIK wajib diisi.";
     } else {
-        // Insert data tamu
-        $stmt = $conn->prepare("INSERT INTO tamu (nama, no_hp, alamat, nik) VALUES (?, ?, ?, ?)"); 
-        $stmt->bind_param('ssss', $nama, $no_hp, $alamat, $nik);
+        // Insert data tamu (Query diperbarui menjadi 5 kolom + ID otomatis)
+        $stmt = $conn->prepare("INSERT INTO tamu (nama, no_hp, alamat, nik, email) VALUES (?, ?, ?, ?, ?)"); 
+        // bind_param updated: sssss (semuanya string)
+        $stmt->bind_param('sssss', $nama, $no_hp, $alamat, $nik, $email);
         
         if ($stmt->execute()) {
             header('Location: index.php');
@@ -35,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <title>Tambah Tamu</title>
@@ -84,10 +85,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                    placeholder="16 digit NIK" required>
                         </div>
                         <div class="col-md-6 mb-4">
-                            <label for="alamat" class="form-label fw-semibold">Alamat</label>
-                            <textarea name="alamat" id="alamat" class="form-control rounded-3" rows="2"
-                                      placeholder="Alamat lengkap tamu"></textarea>
+                            <label for="email" class="form-label fw-semibold">Alamat Email</label>
+                            <input type="email" name="email" id="email" class="form-control form-control-lg rounded-3" 
+                                   placeholder="contoh@mail.com">
                         </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="alamat" class="form-label fw-semibold">Alamat</label>
+                        <textarea name="alamat" id="alamat" class="form-control rounded-3" rows="3"
+                                  placeholder="Alamat lengkap tamu"></textarea>
                     </div>
 
                     <hr class="my-4">

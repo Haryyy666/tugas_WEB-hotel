@@ -3,12 +3,14 @@ require_once '../config/koneksi.php';
 require_once '../inc/auth_check.php';
 require_login();
 
-// Query untuk mengambil semua data kamar, digabungkan (JOIN) dengan data tipe kamar
+// Query diperbarui untuk mengambil kolom lantai dan deskripsi
 $q = $conn->query("
     SELECT 
         k.id, 
         k.nomor_kamar, 
+        k.lantai,
         k.status,
+        k.deskripsi,
         t.nama_tipe 
     FROM kamar k
     JOIN tipe_kamar t ON k.id_tipe = t.id
@@ -48,17 +50,21 @@ $q = $conn->query("
                             <tr>
                                 <th scope="col" class="text-center">No</th>
                                 <th scope="col">Nomor Kamar</th>
-                                <th scope="col">Tipe Kamar</th>
+                                <th scope="col">Lantai</th> <th scope="col">Tipe Kamar</th>
                                 <th scope="col" class="text-center">Status</th>
-                                <th scope="col" class="text-center">Aksi</th>
+                                <th scope="col">Keterangan</th> <th scope="col" class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php $i=1; while($r = $q->fetch_assoc()): ?>
                             <tr>
                                 <td class="text-center align-middle"><?php echo $i++; ?></td>
-                                <td class="fw-bold align-middle"><?php echo htmlspecialchars($r['nomor_kamar']); ?></td>
+                                <td class="fw-bold align-middle text-dark"><?php echo htmlspecialchars($r['nomor_kamar']); ?></td>
                                 
+                                <td class="align-middle text-center">
+                                    <span class="badge bg-light text-dark border"><?php echo htmlspecialchars($r['lantai'] ?: '-'); ?></span>
+                                </td>
+
                                 <td class="align-middle">
                                     <span class="fw-semibold text-primary"><?php echo htmlspecialchars($r['nama_tipe']); ?></span>
                                 </td>
@@ -67,15 +73,17 @@ $q = $conn->query("
                                     <?php 
                                     $status = htmlspecialchars($r['status']);
                                     $badge_class = 'bg-secondary';
-                                    if ($status === 'Tersedia') {
+                                    if ($status === 'tersedia') { // Sesuaikan kecil/besar dengan DB Anda
                                         $badge_class = 'bg-success';
-                                    } elseif ($status === 'Dipesan') {
+                                    } elseif ($status === 'dipesan') {
                                         $badge_class = 'bg-warning text-dark';
-                                    } elseif ($status === 'Rusak') {
-                                        $badge_class = 'bg-danger';
                                     }
                                     ?>
-                                    <span class="badge <?php echo $badge_class; ?> p-2 px-3 fw-bold"><?php echo $status; ?></span>
+                                    <span class="badge <?php echo $badge_class; ?> p-2 px-3 fw-bold"><?php echo ucfirst($status); ?></span>
+                                </td>
+
+                                <td class="align-middle small text-muted">
+                                    <?php echo htmlspecialchars($r['deskripsi'] ?: '-'); ?>
                                 </td>
                                 
                                 <td class="text-center align-middle">
@@ -91,7 +99,7 @@ $q = $conn->query("
                             <?php endwhile; ?>
                             <?php if ($q->num_rows === 0): ?>
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted p-4">
+                                    <td colspan="7" class="text-center text-muted p-4">
                                         Belum ada Kamar yang terdaftar.
                                     </td>
                                 </tr>
@@ -112,5 +120,4 @@ $q = $conn->query("
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

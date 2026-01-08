@@ -3,7 +3,7 @@ require_once '../config/koneksi.php';
 require_once '../inc/auth_check.php';
 require_login();
 
-// Query untuk mengambil semua data tamu
+// Query untuk mengambil semua data tamu termasuk field email yang baru
 $q = $conn->query("SELECT * FROM tamu ORDER BY id DESC");
 ?>
 <!doctype html>
@@ -13,14 +13,13 @@ $q = $conn->query("SELECT * FROM tamu ORDER BY id DESC");
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <title>Daftar Tamu</title>
 </head>
 
 <body class="bg-light p-3">
-    <div class="container py-4">
+    <div class="container-fluid py-4">
         
         <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
             <h1 class="h3 fw-bold text-dark">
@@ -34,14 +33,14 @@ $q = $conn->query("SELECT * FROM tamu ORDER BY id DESC");
         <div class="card shadow-sm border-0 rounded-4">
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped mb-0">
+                    <table class="table table-hover table-striped mb-0 small">
                         <thead class="table-primary">
                             <tr>
                                 <th scope="col" class="text-center">No</th>
                                 <th scope="col">Nama Tamu</th>
                                 <th scope="col">No HP</th>
                                 <th scope="col">NIK</th>
-                                <th scope="col">Alamat</th>
+                                <th scope="col">Email</th> <th scope="col">Alamat</th>
                                 <th scope="col" class="text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -51,10 +50,17 @@ $q = $conn->query("SELECT * FROM tamu ORDER BY id DESC");
                                 <td class="text-center align-middle"><?php echo $i++; ?></td>
                                 <td class="fw-semibold align-middle"><?php echo htmlspecialchars($r['nama']); ?></td>
                                 <td class="align-middle"><?php echo htmlspecialchars($r['no_hp']); ?></td>
-                                <td class="align-middle"><?php echo htmlspecialchars($r['nik']); ?></td>
+                                <td class="align-middle"><code><?php echo htmlspecialchars($r['nik']); ?></code></td>
+                                
+                                <td class="align-middle text-primary">
+                                    <?php echo htmlspecialchars($r['email'] ?: '-'); ?>
+                                </td>
+
                                 <td class="text-muted small align-middle">
-                                    <?php echo htmlspecialchars(substr($r['alamat'], 0, 40)); 
-                                          echo (strlen($r['alamat']) > 40) ? '...' : ''; ?>
+                                    <?php 
+                                    echo htmlspecialchars(substr($r['alamat'], 0, 30)); 
+                                    echo (strlen($r['alamat']) > 30) ? '...' : ''; 
+                                    ?>
                                 </td>
                                 
                                 <td class="text-center align-middle">
@@ -68,9 +74,10 @@ $q = $conn->query("SELECT * FROM tamu ORDER BY id DESC");
                                 </td>
                             </tr>
                             <?php endwhile; ?>
+                            
                             <?php if ($q->num_rows === 0): ?>
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted p-4">
+                                    <td colspan="7" class="text-center text-muted p-4">
                                         Belum ada data Tamu yang terdaftar.
                                     </td>
                                 </tr>
